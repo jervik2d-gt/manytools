@@ -137,12 +137,40 @@ button:hover{background:var(--dark)}
 <option value="image/tiff">TIFF (.tiff)</option>
 <option value="image/avif">AVIF (.avif)</option>
 <option value="image/x-icon">ICO (.ico)</option>
-<option value="application/pdf">PDF (.pdf)</option>
+
 
     </select>
     <div class="preview"><img id="convPreview"></div>
     <button onclick="convertImage()">Convert & Download</button>
   </div>
+<!-- IMAGE CROPPER -->
+<div class="tool">
+  <h2>Image Cropper & Rotator</h2>
+
+  <input type="file" id="cropUpload" accept="image/*">
+
+  <label>Rotate (degrees)</label>
+  <input type="range" id="rotateDeg" min="0" max="360" value="0">
+
+  <label>Flip</label>
+  <select id="flipMode">
+    <option value="none">None</option>
+    <option value="h">Horizontal</option>
+    <option value="v">Vertical</option>
+  </select>
+
+  <label>Crop Area (px)</label>
+  <input type="number" id="cropX" placeholder="X (start)">
+  <input type="number" id="cropY" placeholder="Y (start)">
+  <input type="number" id="cropW" placeholder="Width">
+  <input type="number" id="cropH" placeholder="Height">
+
+  <div class="preview">
+    <img id="cropPreview">
+  </div>
+
+  <button onclick="applyCrop()">Apply & Download</button>
+</div>
 
   <!-- IMAGE COMPRESSOR -->
   <div class="tool">
@@ -154,13 +182,36 @@ button:hover{background:var(--dark)}
   </div>
 
   <!-- IMAGE RESIZER -->
-  <div class="tool">
-    <h2>Image Resizer</h2>
-    <input type="file" id="resizeUpload" accept="image/*">
-    <input type="number" id="resizeW" placeholder="Width (px)">
-    <input type="number" id="resizeH" placeholder="Height (px)">
-    <button onclick="resizeImage()">Resize & Download</button>
+<div class="tool">
+  <h2>Image Resizer</h2>
+
+  <input type="file" id="resizeUpload" accept="image/*">
+
+  <p id="resizeInfo" style="font-size:13px;color:#555;margin-bottom:10px;"></p>
+
+  <select id="resizeUnit">
+    <option value="px">Pixels (px)</option>
+    <option value="cm">Centimeters (cm)</option>
+    <option value="inch">Inches (in)</option>
+  </select>
+
+  <input type="number" id="resizeW" placeholder="Width">
+  <input type="number" id="resizeH" placeholder="Height">
+
+  <label>Output Size (KB)</label>
+  <input type="range" id="sizeSlider" min="20" max="2000" value="500">
+  <p id="sizeLabel" style="font-size:13px;color:#555;margin-bottom:10px;">
+    Target: 500 KB
+  </p>
+
+  <!-- LIVE PREVIEW -->
+  <div class="preview">
+    <img id="resizePreview">
   </div>
+
+  <button onclick="resizeImage()">Resize & Download</button>
+</div>
+
 
   <!-- IMAGE GRAYSCALE -->
   <div class="tool">
@@ -288,41 +339,106 @@ function compressImage() {
 }
 
 /* ======================================================
-   IMAGE RESIZER – SHOW ORIGINAL SIZE + RESIZE
+   IMAGE RESIZER – ORIGINAL SIZE + UNIT + KB + LIVE PREVIEW
 ====================================================== */
+
 const resizeUpload = document.getElementById("resizeUpload");
 const resizeInfo = document.getElementById("resizeInfo");
+const resizePreview = document.getElementById("resizePreview");
+const sizeSlider = document.getElementById("sizeSlider");
+const sizeLabel = document.getElementById("sizeLabel");
 
+/* ---- On image upload ---- */
 if (resizeUpload) {
   resizeUpload.addEventListener("change", e => {
     readImage(e.target.files[0], img => {
       const kb = (currentFile.size / 1024).toFixed(2);
       resizeInfo.textContent =
         `Original: ${img.width}px × ${img.height}px | ${kb} KB`;
+      updateResizePreview();
     });
   });
 }
 
-function resizeImage() {
-  if (!currentImage) {
-    alert("Upload an image first");
-    return;
+/* ---- Slider live label ---- */
+if (sizeSlider) {
+  sizeSlider.addEventListener("input", () => {
+    sizeLabel.textContent = `Target: ${sizeSlider.value} KB`;
+    updateResizePreview();
+  });
+}
+
+/* ---- Live preview triggers ---- */
+["resizeW", "resizeH", "resizeUnit"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", updateResizePreview);
+});
+
+/* ---- Preview renderer ---- */
+function updateResizePreview() {
+  if (!currentImage) return;
+
+  const unit = document.getElementById("resizeUnit").value;
+
+  let w = parseFloat(document.getElementById("resizeW").value) || currentImage.width;
+  let h = parseFloat(document.getElementById("resizeH").value) || currentImage.height;
+
+  if (unit === "cm") {
+    w *= 37.795;
+    h *= 37.795;
+  }
+  if (unit === "inch") {
+    w *= 96;
+    h *= 96;
   }
 
-  const w = parseInt(document.getElementById("resizeW").value) || currentImage.width;
-  const h = parseInt(document.getElementById("resizeH").value) || currentImage.height;
+  w = Math.round(w);
+  h = Math.round(h);
 
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   canvas.getContext("2d").drawImage(currentImage, 0, 0, w, h);
 
-  canvas.toBlob(blob => {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "resized.png";
-    link.click();
-  });
+  resizePreview.src = canvas.toDataURL("image/jpeg", 0.9);
+  resizePreview.style.display = "block";
+}
+
+/* ---- Final resize + KB controlled download ---- */
+function resizeImage() {
+  if (!currentImage) {
+    alert("Upload an image first");
+    return;
+  }
+
+  const targetKB = parseInt(sizeSlider.value, 10);
+  let quality = 0.92;
+
+  const w = resizePreview.naturalWidth;
+  const h = resizePreview.naturalHeight;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d").drawImage(currentImage, 0, 0, w, h);
+
+  function exportWithLimit() {
+    canvas.toBlob(blob => {
+      const kb = blob.size / 1024;
+
+      if (kb > targetKB && quality > 0.1) {
+        quality -= 0.05;
+        exportWithLimit();
+      } else {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "resized.jpg";
+        link.click();
+      }
+    }, "image/jpeg", quality);
+  }
+
+  exportWithLimit();
 }
 
 /* ======================================================
@@ -360,7 +476,104 @@ function grayscaleImage() {
       link.click();
     });
   });
+}  
+ /* ======================================================
+   IMAGE CROPPER + ROTATE + FLIP (LIVE PREVIEW)
+====================================================== */
+
+const cropUpload = document.getElementById("cropUpload");
+const cropPreview = document.getElementById("cropPreview");
+
+/* ---- Image upload ---- */
+if (cropUpload) {
+  cropUpload.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    readImage(file, () => {
+      cropPreview.style.display = "block";
+      updateCropPreview();
+    });
+  });
 }
+
+/* ---- Apply & Download ---- */
+function applyCrop() {
+  if (!currentImage) {
+    alert("Please upload an image first");
+    return;
+  }
+
+  const x = parseInt(document.getElementById("cropX").value) || 0;
+  const y = parseInt(document.getElementById("cropY").value) || 0;
+  const w = parseInt(document.getElementById("cropW").value) || currentImage.width;
+  const h = parseInt(document.getElementById("cropH").value) || currentImage.height;
+
+  const rotate = parseInt(document.getElementById("rotateDeg").value) || 0;
+  const flip = document.getElementById("flipMode").value;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+
+  const ctx = canvas.getContext("2d");
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate((rotate * Math.PI) / 180);
+
+  if (flip === "h") ctx.scale(-1, 1);
+  if (flip === "v") ctx.scale(1, -1);
+
+  ctx.drawImage(currentImage, x - w / 2, y - h / 2);
+
+  canvas.toBlob(blob => {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "cropped.png";
+    link.click();
+  });
+}
+
+/* ======================================================
+   LIVE PREVIEW HANDLERS
+====================================================== */
+
+const cropInputs = ["cropX", "cropY", "cropW", "cropH", "rotateDeg", "flipMode"];
+
+cropInputs.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", updateCropPreview);
+});
+
+/* ---- Live preview renderer ---- */
+function updateCropPreview() {
+  if (!currentImage) return;
+
+  const x = parseInt(document.getElementById("cropX").value) || 0;
+  const y = parseInt(document.getElementById("cropY").value) || 0;
+  const w = parseInt(document.getElementById("cropW").value) || currentImage.width;
+  const h = parseInt(document.getElementById("cropH").value) || currentImage.height;
+
+  const rotate = parseInt(document.getElementById("rotateDeg").value) || 0;
+  const flip = document.getElementById("flipMode").value;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+
+  const ctx = canvas.getContext("2d");
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate((rotate * Math.PI) / 180);
+
+  if (flip === "h") ctx.scale(-1, 1);
+  if (flip === "v") ctx.scale(1, -1);
+
+  ctx.drawImage(currentImage, x - w / 2, y - h / 2);
+
+  cropPreview.src = canvas.toDataURL("image/png");
+  cropPreview.style.display = "block";
+}
+
+
 </script>
 
 
