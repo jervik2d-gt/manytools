@@ -5,120 +5,272 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Image Tools – Many Tools</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
+:root{
+  --blue:#2563eb;
+  --dark:#1d4ed8;
+  --light:#eff6ff;
+  --white:#fff;
+  --shadow:0 4px 8px rgba(0,0,0,.1);
+  --radius:12px;
+}
+
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
-body{background:#eff6ff}
+body{background:var(--light);}
 
-.tool-stage{
-  max-width:450px;
-  margin:80px auto;
-  overflow:hidden;
-  position:relative;
+/* ===== HEADER (SAME STRUCTURE) ===== */
+header{background:#fff;box-shadow:var(--shadow);position:sticky;top:0;z-index:100}
+.container{max-width:1200px;margin:auto;padding:0 20px}
+.header-container{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.logo{display:flex;align-items:center;gap:8px;font-size:1.6rem;font-weight:700;color:var(--blue);text-decoration:none}
+nav ul{display:flex;gap:25px;list-style:none}
+nav a{text-decoration:none;color:#111}
+.mobile-menu-btn{display:none;background:none;border:none;font-size:1.4rem;color:var(--blue)}
+.contact-email{text-decoration:none;color:var(--blue)}
+
+@media(max-width:768px){
+  nav{display:none;position:absolute;top:70px;left:0;width:100%;background:#fff;padding:20px}
+  nav.active{display:block}
+  nav ul{flex-direction:column}
+  .mobile-menu-btn{display:block}
+  .contact-email{display:none}
 }
 
-.tool-slider{
+/* ===== TOOL AREA ===== */
+.tool-wrapper{
   display:flex;
-  transition:transform 0.5s ease;
-}
-
-.tool{
-  min-width:100%;
-  background:#fff;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.1);
-}
-
-.tool h2{
-  text-align:center;
-  color:#2563eb;
-  margin-bottom:20px;
-}
-
-.placeholder{
-  height:160px;
-  background:#e5e7eb;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
   justify-content:center;
-  font-weight:600;
-  color:#374151;
+  padding:40px 15px;
 }
 
-/* Button */
-.next-btn{
-  margin-top:15px;
+.tool-box{
+  background:#fff;
+  width:100%;
+  max-width:450px;
+  padding:25px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.tool{display:none}
+.tool.active{display:block}
+
+.tool h2{text-align:center;color:var(--blue);margin-bottom:20px}
+
+label{font-size:14px;font-weight:600}
+input,select{width:100%;margin:10px 0 16px}
+
+/* Buttons */
+button{
   width:100%;
   padding:12px;
-  background:#2563eb;
+  background:var(--blue);
   color:#fff;
   border:none;
   border-radius:8px;
-  font-size:15px;
   cursor:pointer;
 }
-.next-btn:hover{background:#1d4ed8}
+button:hover{background:var(--dark)}
+
+.preview{text-align:center;margin-bottom:15px}
+.preview img{max-width:100%;display:none;border-radius:8px}
+
+/* Nav buttons */
+.tool-nav{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+.tool-nav a,.tool-nav button{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  font-weight:600;
+}
+.back-btn{background:#e5e7eb;color:#111}
+.next-btn{background:#dbeafe;color:var(--blue)}
 </style>
 </head>
 
 <body>
 
-<div class="tool-stage">
+<header>
+  <div class="container header-container">
+    <a href="index.html" class="logo">
+      <i class="fas fa-tools"></i>Many Tools
+    </a>
 
-  <div class="tool-slider" id="slider">
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
 
-    <!-- Image Converter -->
-    <div class="tool">
-      <h2>Image Converter</h2>
-      <div class="placeholder">Converter UI here</div>
-    </div>
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#tools">All Tools</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
 
-    <!-- Image Compressor -->
-    <div class="tool">
-      <h2>Image Compressor</h2>
-      <div class="placeholder">Compressor UI here</div>
-    </div>
+    <a href="mailto:jervik2d@gmail.com" class="contact-email">
+      <i class="fas fa-envelope"></i> jervik2d@gmail.com
+    </a>
+  </div>
+</header>
 
-    <!-- Image Resizer -->
-    <div class="tool">
-      <h2>Image Resizer</h2>
-      <div class="placeholder">Resizer UI here</div>
-    </div>
+<div class="tool-wrapper">
+<div class="tool-box">
 
-    <!-- Image Cropper -->
-    <div class="tool">
-      <h2>Image Cropper</h2>
-      <div class="placeholder">Cropper UI here</div>
-    </div>
-
+  <!-- IMAGE CONVERTER -->
+  <div class="tool active">
+    <h2>Image Converter</h2>
+    <input type="file" id="convUpload" accept="image/*">
+    <select id="convFormat">
+      <option value="image/jpeg">JPG</option>
+      <option value="image/png">PNG</option>
+      <option value="image/webp">WEBP</option>
+    </select>
+    <div class="preview"><img id="convPreview"></div>
+    <button onclick="convertImage()">Convert & Download</button>
   </div>
 
-  <button class="next-btn" id="nextBtn">
-    Next: Image Compressor →
-  </button>
+  <!-- IMAGE COMPRESSOR -->
+  <div class="tool">
+    <h2>Image Compressor</h2>
+    <input type="file" id="compUpload" accept="image/*">
+    <label>Quality</label>
+    <input type="range" id="compQuality" min="0.1" max="1" step="0.1" value="0.6">
+    <button onclick="compressImage()">Compress & Download</button>
+  </div>
 
+  <!-- IMAGE RESIZER -->
+  <div class="tool">
+    <h2>Image Resizer</h2>
+    <input type="file" id="resizeUpload" accept="image/*">
+    <input type="number" id="resizeW" placeholder="Width (px)">
+    <input type="number" id="resizeH" placeholder="Height (px)">
+    <button onclick="resizeImage()">Resize & Download</button>
+  </div>
+
+  <!-- IMAGE GRAYSCALE -->
+  <div class="tool">
+    <h2>Image Grayscale</h2>
+    <input type="file" id="grayUpload" accept="image/*">
+    <button onclick="grayscaleImage()">Convert to Grayscale</button>
+  </div>
+
+  <div class="tool-nav">
+    <a href="index.html" class="back-btn">← Back</a>
+    <button class="next-btn" id="nextBtn">Next Tool →</button>
+  </div>
+
+</div>
 </div>
 
 <script>
-const tools = [
-  "Image Converter",
-  "Image Compressor",
-  "Image Resizer",
-  "Image Cropper"
-];
+/* Mobile menu */
+document.getElementById("mobileMenuBtn").onclick=()=>{
+  document.getElementById("mainNav").classList.toggle("active");
+};
 
-let index = 0;
-const slider = document.getElementById("slider");
-const btn = document.getElementById("nextBtn");
+/* Tool switching */
+const tools=document.querySelectorAll(".tool");
+let current=0;
+document.getElementById("nextBtn").onclick=()=>{
+  tools[current].classList.remove("active");
+  current=(current+1)%tools.length;
+  tools[current].classList.add("active");
+};
 
-btn.addEventListener("click", () => {
-  index = (index + 1) % tools.length;
-  slider.style.transform = `translateX(-${index * 100}%)`;
+/* Shared canvas helper */
+function loadImage(file,cb){
+  const img=new Image();
+  const r=new FileReader();
+  r.onload=()=>{img.src=r.result;img.onload=()=>cb(img,r.result)};
+  r.readAsDataURL(file);
+}
 
-  const nextName = tools[(index + 1) % tools.length];
-  btn.textContent = `Next: ${nextName} →`;
-});
+/* Converter */
+function convertImage(){
+  const f=document.getElementById("convUpload").files[0];
+  if(!f)return alert("Upload image");
+  loadImage(f,(img)=>{
+    const c=document.createElement("canvas");
+    c.width=img.width;c.height=img.height;
+    c.getContext("2d").drawImage(img,0,0);
+    const fmt=document.getElementById("convFormat").value;
+    c.toBlob(b=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(b);
+      a.download="converted."+fmt.split("/")[1];
+      a.click();
+    },fmt,0.9);
+  });
+}
+
+/* Compressor */
+function compressImage(){
+  const f=document.getElementById("compUpload").files[0];
+  if(!f)return alert("Upload image");
+  loadImage(f,(img)=>{
+    const q=document.getElementById("compQuality").value;
+    const c=document.createElement("canvas");
+    c.width=img.width;c.height=img.height;
+    c.getContext("2d").drawImage(img,0,0);
+    c.toBlob(b=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(b);
+      a.download="compressed.jpg";
+      a.click();
+    },"image/jpeg",q);
+  });
+}
+
+/* Resizer */
+function resizeImage(){
+  const f=document.getElementById("resizeUpload").files[0];
+  if(!f)return alert("Upload image");
+  loadImage(f,(img)=>{
+    const w=document.getElementById("resizeW").value||img.width;
+    const h=document.getElementById("resizeH").value||img.height;
+    const c=document.createElement("canvas");
+    c.width=w;c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    c.toBlob(b=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(b);
+      a.download="resized.png";
+      a.click();
+    });
+  });
+}
+
+/* Grayscale */
+function grayscaleImage(){
+  const f=document.getElementById("grayUpload").files[0];
+  if(!f)return alert("Upload image");
+  loadImage(f,(img)=>{
+    const c=document.createElement("canvas");
+    c.width=img.width;c.height=img.height;
+    const ctx=c.getContext("2d");
+    ctx.drawImage(img,0,0);
+    const d=ctx.getImageData(0,0,c.width,c.height);
+    for(let i=0;i<d.data.length;i+=4){
+      const g=(d.data[i]+d.data[i+1]+d.data[i+2])/3;
+      d.data[i]=d.data[i+1]=d.data[i+2]=g;
+    }
+    ctx.putImageData(d,0,0);
+    c.toBlob(b=>{
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(b);
+      a.download="grayscale.png";
+      a.click();
+    });
+  });
+}
 </script>
 
 </body>
