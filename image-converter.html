@@ -3,306 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Converter – Many Tools</title>
-
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Image Tools – Many Tools</title>
 
 <style>
-/* ===== Theme Variables ===== */
-:root {
-  --primary-blue: #2563eb;
-  --dark-blue: #1d4ed8;
-  --light-blue: #eff6ff;
-  --white: #ffffff;
-  --text-dark: #1f2937;
-  --border-color: #e5e7eb;
-  --shadow: 0 4px 6px rgba(0,0,0,0.1);
-  --radius: 12px;
-  --transition: all 0.3s ease;
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
+body{background:#eff6ff}
+
+.tool-stage{
+  max-width:450px;
+  margin:80px auto;
+  overflow:hidden;
+  position:relative;
 }
 
-/* ===== Global ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+.tool-slider{
+  display:flex;
+  transition:transform 0.5s ease;
 }
 
-body {
-  background: var(--light-blue);
-  color: var(--text-dark);
+.tool{
+  min-width:100%;
+  background:#fff;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
 }
 
-/* ===== Header ===== */
-header {
-  background: var(--white);
-  box-shadow: var(--shadow);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.tool h2{
+  text-align:center;
+  color:#2563eb;
+  margin-bottom:20px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 20px;
+.placeholder{
+  height:160px;
+  background:#e5e7eb;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  color:#374151;
 }
 
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
+/* Button */
+.next-btn{
+  margin-top:15px;
+  width:100%;
+  padding:12px;
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  cursor:pointer;
 }
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--primary-blue);
-  text-decoration: none;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 25px;
-}
-
-nav a {
-  text-decoration: none;
-  color: var(--text-dark);
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: var(--primary-blue);
-}
-
-.contact-email {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--primary-blue);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--primary-blue);
-  cursor: pointer;
-}
-
-/* ===== Image Converter Box ===== */
-.tool-wrapper {
-  min-height: calc(100vh - 90px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 15px;
-}
-
-.converter-box {
-  background: var(--white);
-  width: 100%;
-  max-width: 420px;
-  padding: 25px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.converter-box h2 {
-  text-align: center;
-  color: var(--primary-blue);
-  margin-bottom: 20px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-input[type="file"],
-select,
-input[type="range"] {
-  width: 100%;
-  margin: 10px 0 18px;
-}
-
-.preview {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.preview img {
-  max-width: 100%;
-  border-radius: 8px;
-  display: none;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: var(--primary-blue);
-  color: var(--white);
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: var(--dark-blue);
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: block;
-  }
-
-  nav {
-    position: absolute;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background: var(--white);
-    padding: 20px;
-    display: none;
-    box-shadow: var(--shadow);
-  }
-
-  nav.active {
-    display: block;
-  }
-
-  nav ul {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .contact-email {
-    display: none;
-  }
-}
+.next-btn:hover{background:#1d4ed8}
 </style>
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
-<header>
-  <div class="container header-container">
-    <a href="index.html" class="logo">
-      <i class="fas fa-tools"></i>
-      <span>Many Tools</span>
-    </a>
+<div class="tool-stage">
 
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-      <i class="fas fa-bars"></i>
-    </button>
+  <div class="tool-slider" id="slider">
 
-    <nav id="mainNav">
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="index.html#tools">All Tools</a></li>
-        <li><a href="index.html#contact">Contact</a></li>
-      </ul>
-    </nav>
-
-    <a href="mailto:jervik2d@gmail.com" class="contact-email">
-      <i class="fas fa-envelope"></i>
-      <span>jervik2d@gmail.com</span>
-    </a>
-  </div>
-</header>
-
-<!-- ===== TOOL ===== -->
-<div class="tool-wrapper">
-  <div class="converter-box">
-    <h2>Image Converter</h2>
-
-    <input type="file" id="upload" accept="image/*">
-
-    <label>Convert To</label>
-    <select id="format">
-      <option value="image/jpeg">JPG</option>
-      <option value="image/png">PNG</option>
-      <option value="image/webp">WEBP</option>
-    </select>
-
-    <label>Compression Quality</label>
-    <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8">
-
-    <div class="preview">
-      <img id="previewImage">
+    <!-- Image Converter -->
+    <div class="tool">
+      <h2>Image Converter</h2>
+      <div class="placeholder">Converter UI here</div>
     </div>
 
-    <button onclick="convertImage()">Convert & Download</button>
+    <!-- Image Compressor -->
+    <div class="tool">
+      <h2>Image Compressor</h2>
+      <div class="placeholder">Compressor UI here</div>
+    </div>
+
+    <!-- Image Resizer -->
+    <div class="tool">
+      <h2>Image Resizer</h2>
+      <div class="placeholder">Resizer UI here</div>
+    </div>
+
+    <!-- Image Cropper -->
+    <div class="tool">
+      <h2>Image Cropper</h2>
+      <div class="placeholder">Cropper UI here</div>
+    </div>
+
   </div>
+
+  <button class="next-btn" id="nextBtn">
+    Next: Image Compressor →
+  </button>
+
 </div>
 
 <script>
-/* ===== Mobile Menu ===== */
-const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-const mainNav = document.getElementById("mainNav");
+const tools = [
+  "Image Converter",
+  "Image Compressor",
+  "Image Resizer",
+  "Image Cropper"
+];
 
-mobileMenuBtn.addEventListener("click", () => {
-  mainNav.classList.toggle("active");
-  const icon = mobileMenuBtn.querySelector("i");
-  icon.classList.toggle("fa-bars");
-  icon.classList.toggle("fa-times");
+let index = 0;
+const slider = document.getElementById("slider");
+const btn = document.getElementById("nextBtn");
+
+btn.addEventListener("click", () => {
+  index = (index + 1) % tools.length;
+  slider.style.transform = `translateX(-${index * 100}%)`;
+
+  const nextName = tools[(index + 1) % tools.length];
+  btn.textContent = `Next: ${nextName} →`;
 });
-
-/* ===== Image Converter ===== */
-const upload = document.getElementById("upload");
-const previewImage = document.getElementById("previewImage");
-let originalImage = new Image();
-
-upload.addEventListener("change", () => {
-  const file = upload.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    originalImage.src = reader.result;
-    previewImage.src = reader.result;
-    previewImage.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-});
-
-function convertImage() {
-  if (!originalImage.src) {
-    alert("Please upload an image first");
-    return;
-  }
-
-  const format = document.getElementById("format").value;
-  const quality = document.getElementById("quality").value;
-
-  const canvas = document.createElement("canvas");
-  canvas.width = originalImage.width;
-  canvas.height = originalImage.height;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(originalImage, 0, 0);
-
-  canvas.toBlob(blob => {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `converted-image.${format.split("/")[1]}`;
-    link.click();
-  }, format, quality);
-}
 </script>
 
 </body>
