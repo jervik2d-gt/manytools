@@ -129,9 +129,16 @@ button:hover{background:var(--dark)}
     <h2>Image Converter</h2>
     <input type="file" id="convUpload" accept="image/*">
     <select id="convFormat">
-      <option value="image/jpeg">JPG</option>
-      <option value="image/png">PNG</option>
-      <option value="image/webp">WEBP</option>
+     <option value="image/jpeg">JPG (.jpg)</option>
+<option value="image/jpeg">JPEG (.jpeg)</option>
+<option value="image/png">PNG (.png)</option>
+<option value="image/webp">WEBP (.webp)</option>
+<option value="image/bmp">BMP (.bmp)</option>
+<option value="image/tiff">TIFF (.tiff)</option>
+<option value="image/avif">AVIF (.avif)</option>
+<option value="image/x-icon">ICO (.ico)</option>
+<option value="application/pdf">PDF (.pdf)</option>
+
     </select>
     <div class="preview"><img id="convPreview"></div>
     <button onclick="convertImage()">Convert & Download</button>
@@ -251,6 +258,7 @@ function convertImage() {
     link.click();
   }, format, 0.9);
 }
+
 
 /* ======================================================
    IMAGE COMPRESSOR
