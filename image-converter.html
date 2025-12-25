@@ -5,33 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Image Tools – Many Tools</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 :root{
   --blue:#2563eb;
   --dark:#1d4ed8;
   --light:#eff6ff;
-  --shadow:0 4px 8px rgba(0,0,0,.1);
+  --shadow:0 6px 16px rgba(0,0,0,.12);
+  --radius:14px;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
-body{background:var(--light)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+body{background:var(--light);color:#111}
 
-/* HEADER */
-header{background:#fff;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
+/* ===== HEADER ===== */
+header{
+  background:#fff;
+  box-shadow:var(--shadow);
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
 .container{max-width:1200px;margin:auto;padding:0 20px}
-.header-container{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
-.logo{font-size:1.6rem;font-weight:700;color:var(--blue);text-decoration:none}
+.header-container{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 0;
+}
+.logo{
+  font-size:1.5rem;
+  font-weight:700;
+  color:var(--blue);
+  text-decoration:none;
+}
 
-/* TOOL AREA */
-.tool-wrapper{display:flex;justify-content:center;padding:40px 15px}
-.tool-box{background:#fff;width:100%;max-width:460px;padding:25px;border-radius:12px;box-shadow:var(--shadow)}
+/* ===== TOOL WRAPPER ===== */
+.tool-wrapper{display:flex;justify-content:center;padding:32px 12px}
+.tool-box{
+  background:#fff;
+  width:100%;
+  max-width:480px;
+  padding:22px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
 .tool{display:none}
 .tool.active{display:block}
-.tool h2{text-align:center;color:var(--blue);margin-bottom:20px}
 
-input,select{width:100%;margin:10px 0}
+.tool h2{
+  text-align:center;
+  color:var(--blue);
+  margin-bottom:16px;
+}
+
+input,select{
+  width:100%;
+  margin:10px 0;
+}
 
 button{
   width:100%;
@@ -39,23 +72,52 @@ button{
   background:var(--blue);
   color:#fff;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
+  font-weight:600;
 }
 button:hover{background:var(--dark)}
 
-.preview img{max-width:100%;display:none;border-radius:8px}
+.preview img{
+  max-width:100%;
+  display:none;
+  border-radius:10px;
+}
 
-/* NAV */
-.tool-nav{display:flex;gap:10px;margin-top:15px}
-.tool-nav a,.tool-nav button{flex:1;font-weight:600}
+/* ===== TOOL NAV ===== */
+.tool-nav{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+.tool-nav a,.tool-nav button{
+  flex:1;
+  text-align:center;
+}
 .back-btn{background:#e5e7eb;color:#111}
 .next-btn{background:#dbeafe;color:var(--blue)}
 
-/* ================= CROPPER ================= */
-.crop-container{position:relative;margin-bottom:15px;overflow:hidden}
-#cropImage{width:100%;display:block;transform-origin:center center}
+/* ======================================================
+   EDIT PHOTO (ADVANCED CROPPER)
+====================================================== */
 
+.crop-container{
+  position:relative;
+  margin:14px 0;
+  overflow:hidden;
+  border-radius:12px;
+  background:#000;
+}
+
+#cropImage{
+  width:100%;
+  display:block;
+  transform-origin:center center;
+  user-select:none;
+  touch-action:none;
+}
+
+/* Overlay */
 #cropOverlay{
   position:absolute;
   inset:0;
@@ -64,28 +126,79 @@ button:hover{background:var(--dark)}
   z-index:1;
 }
 
+/* Crop Box */
 #cropBox{
   position:absolute;
   border:2px dashed var(--blue);
   z-index:2;
   touch-action:none;
+  cursor:grab;
 }
+#cropBox:active{cursor:grabbing}
 
+/* Grid */
 .grid-line{position:absolute;background:rgba(37,99,235,.6)}
 .grid-line.v1{left:33.33%;top:0;width:1px;height:100%}
 .grid-line.v2{left:66.66%;top:0;width:1px;height:100%}
 .grid-line.h1{top:33.33%;left:0;height:1px;width:100%}
 .grid-line.h2{top:66.66%;left:0;height:1px;width:100%}
 
+/* Handles */
 .handle{
-  width:12px;height:12px;background:var(--blue);position:absolute
+  width:14px;
+  height:14px;
+  background:var(--blue);
+  position:absolute;
+  border-radius:50%;
 }
-.handle.tl{top:-6px;left:-6px}
-.handle.tr{top:-6px;right:-6px}
-.handle.bl{bottom:-6px;left:-6px}
-.handle.br{bottom:-6px;right:-6px}
+.handle.tl{top:-7px;left:-7px}
+.handle.tr{top:-7px;right:-7px}
+.handle.bl{bottom:-7px;left:-7px}
+.handle.br{bottom:-7px;right:-7px}
 
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* ===== EDIT TOOLBAR ===== */
+.edit-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:10px 0;
+}
+.icon-btn{
+  background:#f1f5f9;
+  color:#111;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:16px;
+}
+.icon-btn.active{background:var(--blue);color:#fff}
+
+/* Aspect Ratios */
+.ratio-bar{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  margin:10px 0;
+}
+.ratio{
+  min-width:64px;
+  padding:6px;
+  border:2px solid #e5e7eb;
+  border-radius:10px;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+}
+.ratio.active{
+  border-color:var(--blue);
+  background:#eff6ff;
+}
+
+/* Zoom Slider */
+#zoomSlider{display:none}
+
+/* ======================================================
+   END STYLES
+====================================================== */
 </style>
 </head>
 
@@ -115,49 +228,51 @@ button:hover{background:var(--dark)}
 <button onclick="convertImage()">Convert & Download</button>
 </div>
 
-<!-- IMAGE CROPPER -->
+<!-- EDIT PHOTO -->
 <div class="tool">
-<h2>Advanced Image Cropper</h2>
+<h2>Edit Photo</h2>
 
 <input type="file" id="cropUpload" accept="image/*">
 
-<label>Zoom</label>
+<div class="edit-toolbar">
+  <div>
+    <button class="icon-btn" id="undoBtn"><i class="fa fa-rotate-left"></i></button>
+    <button class="icon-btn" id="redoBtn"><i class="fa fa-rotate-right"></i></button>
+  </div>
+  <div>
+    <button class="icon-btn" id="rotateBtn"><i class="fa fa-rotate"></i></button>
+    <button class="icon-btn" id="resetBtn"><i class="fa fa-trash"></i></button>
+  </div>
+</div>
+
+<div class="ratio-bar" id="ratioBar">
+  <div class="ratio active" data-r="free">Free</div>
+  <div class="ratio" data-r="1">1:1<br>Instagram</div>
+  <div class="ratio" data-r="4/5">4:5<br>Post</div>
+  <div class="ratio" data-r="9/16">9:16<br>Story</div>
+  <div class="ratio" data-r="16/9">16:9<br>YouTube</div>
+  <div class="ratio" data-r="3/2">3:2</div>
+</div>
+
+<div class="crop-container" id="cropContainer">
+  <img id="cropImage">
+  <div id="cropOverlay"></div>
+
+  <div id="cropBox">
+    <div class="grid-line v1"></div>
+    <div class="grid-line v2"></div>
+    <div class="grid-line h1"></div>
+    <div class="grid-line h2"></div>
+    <span class="handle tl"></span>
+    <span class="handle tr"></span>
+    <span class="handle bl"></span>
+    <span class="handle br"></span>
+  </div>
+</div>
+
 <input type="range" id="zoomSlider" min="1" max="3" step="0.01" value="1">
 
-<label>Rotate</label>
-<input type="range" id="rotateSlider" min="0" max="360" value="0">
-
-<label>Aspect Ratio</label>
-<select id="ratioSelect">
-<option value="free">Free</option>
-<option value="1">1 : 1</option>
-<option value="4/5">4 : 5</option>
-<option value="16/9">16 : 9</option>
-<option value="9/16">9 : 16</option>
-</select>
-
-<div class="controls">
-<button onclick="flipH()">Flip H</button>
-<button onclick="flipV()">Flip V</button>
-</div>
-
-<div class="crop-container">
-<img id="cropImage">
-<div id="cropOverlay"></div>
-
-<div id="cropBox">
-<div class="grid-line v1"></div>
-<div class="grid-line v2"></div>
-<div class="grid-line h1"></div>
-<div class="grid-line h2"></div>
-<span class="handle tl"></span>
-<span class="handle tr"></span>
-<span class="handle bl"></span>
-<span class="handle br"></span>
-</div>
-</div>
-
-<button onclick="applyCrop()">Crop & Download</button>
+<button onclick="applyCrop()">Download</button>
 </div>
 
 <!-- IMAGE COMPRESSOR -->
@@ -173,11 +288,6 @@ button:hover{background:var(--dark)}
 <div class="tool">
 <h2>Image Resizer</h2>
 <input type="file" id="resizeUpload" accept="image/*">
-<select id="resizeUnit">
-<option value="px">Pixels</option>
-<option value="cm">Centimeters</option>
-<option value="inch">Inches</option>
-</select>
 <input type="number" id="resizeW" placeholder="Width">
 <input type="number" id="resizeH" placeholder="Height">
 <label>Target Size (KB)</label>
@@ -203,206 +313,266 @@ button:hover{background:var(--dark)}
 </div>
 
 <script>
-/* TOOL SWITCH */
+/* ======================================================
+   TOOL SWITCHING
+====================================================== */
 const tools=document.querySelectorAll(".tool");
 let toolIndex=0;
 nextBtn.onclick=()=>{
-tools[toolIndex].classList.remove("active");
-toolIndex=(toolIndex+1)%tools.length;
-tools[toolIndex].classList.add("active");
+  tools[toolIndex].classList.remove("active");
+  toolIndex=(toolIndex+1)%tools.length;
+  tools[toolIndex].classList.add("active");
 };
 
-/* IMAGE CONVERTER */
+/* ======================================================
+   IMAGE CONVERTER
+====================================================== */
 let currentImage=null;
 convUpload.onchange=e=>{
-const r=new FileReader();
-r.onload=()=>{convPreview.src=r.result;convPreview.style.display="block";currentImage=new Image();currentImage.src=r.result};
-r.readAsDataURL(e.target.files[0]);
+  const r=new FileReader();
+  r.onload=()=>{
+    convPreview.src=r.result;
+    convPreview.style.display="block";
+    currentImage=new Image();
+    currentImage.src=r.result;
+  };
+  r.readAsDataURL(e.target.files[0]);
 };
 function convertImage(){
-const c=document.createElement("canvas");
-c.width=currentImage.width;c.height=currentImage.height;
-c.getContext("2d").drawImage(currentImage,0,0);
-c.toBlob(b=>{
-const a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="converted";
-a.click();
-},convFormat.value,0.9);
+  if(!currentImage)return;
+  const c=document.createElement("canvas");
+  c.width=currentImage.width;
+  c.height=currentImage.height;
+  c.getContext("2d").drawImage(currentImage,0,0);
+  c.toBlob(b=>{
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(b);
+    a.download="converted."+convFormat.value.split("/")[1];
+    a.click();
+  },convFormat.value,0.9);
 }
 
-/* COMPRESS */
+/* ======================================================
+   IMAGE COMPRESSOR, RESIZER, GRAYSCALE
+   (UNCHANGED LOGIC – WORKING)
+====================================================== */
 function compressImage(){
-const f=compUpload.files[0];
-if(!f)return;
-const r=new FileReader();
-r.onload=()=>{
-const i=new Image();
-i.onload=()=>{
-const c=document.createElement("canvas");
-c.width=i.width;c.height=i.height;
-c.getContext("2d").drawImage(i,0,0);
-c.toBlob(b=>{
-const a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="compressed.jpg";
-a.click();
-},"image/jpeg",compQuality.value);
-};
-i.src=r.result;
-};
-r.readAsDataURL(f);
+  const f=compUpload.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const i=new Image();
+    i.onload=()=>{
+      const c=document.createElement("canvas");
+      c.width=i.width;c.height=i.height;
+      c.getContext("2d").drawImage(i,0,0);
+      c.toBlob(b=>{
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(b);
+        a.download="compressed.jpg";
+        a.click();
+      },"image/jpeg",compQuality.value);
+    };
+    i.src=r.result;
+  };
+  r.readAsDataURL(f);
 }
 
-/* RESIZER */
 resizeUpload.onchange=e=>{
-const r=new FileReader();
-r.onload=()=>{resizePreview.src=r.result;resizePreview.style.display="block";currentImage=new Image();currentImage.src=r.result};
-r.readAsDataURL(e.target.files[0]);
+  const r=new FileReader();
+  r.onload=()=>{
+    resizePreview.src=r.result;
+    resizePreview.style.display="block";
+    currentImage=new Image();
+    currentImage.src=r.result;
+  };
+  r.readAsDataURL(e.target.files[0]);
 };
 sizeSlider.oninput=()=>sizeLabel.textContent=`Target: ${sizeSlider.value} KB`;
 
 function resizeImage(){
-let w=resizeW.value||currentImage.width;
-let h=resizeH.value||currentImage.height;
-const c=document.createElement("canvas");
-c.width=w;c.height=h;
-c.getContext("2d").drawImage(currentImage,0,0,w,h);
-let q=0.9;
-(function loop(){
-c.toBlob(b=>{
-if(b.size/1024>sizeSlider.value&&q>0.1){q-=0.05;loop()}
-else{
-const a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="resized.jpg";
-a.click();
-}
-},"image/jpeg",q);
-})();
+  if(!currentImage)return;
+  let w=resizeW.value||currentImage.width;
+  let h=resizeH.value||currentImage.height;
+  const c=document.createElement("canvas");
+  c.width=w;c.height=h;
+  c.getContext("2d").drawImage(currentImage,0,0,w,h);
+  let q=0.9;
+  (function loop(){
+    c.toBlob(b=>{
+      if(b.size/1024>sizeSlider.value&&q>0.1){q-=0.05;loop()}
+      else{
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(b);
+        a.download="resized.jpg";
+        a.click();
+      }
+    },"image/jpeg",q);
+  })();
 }
 
-/* GRAYSCALE */
 function grayscaleImage(){
-const f=grayUpload.files[0];
-if(!f)return;
-const r=new FileReader();
-r.onload=()=>{
-const i=new Image();
-i.onload=()=>{
-const c=document.createElement("canvas");
-c.width=i.width;c.height=i.height;
-const x=c.getContext("2d");
-x.drawImage(i,0,0);
-const d=x.getImageData(0,0,c.width,c.height);
-for(let i=0;i<d.data.length;i+=4){
-const g=(d.data[i]+d.data[i+1]+d.data[i+2])/3;
-d.data[i]=d.data[i+1]=d.data[i+2]=g;
-}
-x.putImageData(d,0,0);
-c.toBlob(b=>{
-const a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="grayscale.png";
-a.click();
-});
-};
-i.src=r.result;
-};
-r.readAsDataURL(f);
+  const f=grayUpload.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const i=new Image();
+    i.onload=()=>{
+      const c=document.createElement("canvas");
+      c.width=i.width;c.height=i.height;
+      const x=c.getContext("2d");
+      x.drawImage(i,0,0);
+      const d=x.getImageData(0,0,c.width,c.height);
+      for(let i=0;i<d.data.length;i+=4){
+        const g=(d.data[i]+d.data[i+1]+d.data[i+2])/3;
+        d.data[i]=d.data[i+1]=d.data[i+2]=g;
+      }
+      x.putImageData(d,0,0);
+      c.toBlob(b=>{
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(b);
+        a.download="grayscale.png";
+        a.click();
+      });
+    };
+    i.src=r.result;
+  };
+  r.readAsDataURL(f);
 }
 
-/* CROPPER */
-let img=document.getElementById("cropImage");
+/* ======================================================
+   EDIT PHOTO – CROPPER CORE
+====================================================== */
+
+let img=cropImage;
 let cropBox=document.getElementById("cropBox");
 let overlay=document.getElementById("cropOverlay");
-let zoom=zoomSlider,rot=rotateSlider,ratio=ratioSelect;
+let zoom=zoomSlider;
+
 let sx=60,sy=60,bw=200,bh=200;
-let drag=false,resize=false,handle=null,ox=0,oy=0;
-let fx=1,fy=1;
+let dragging=false,resizing=false,handle=null;
+let ox=0,oy=0;
+let rotation=0,scale=1;
 
 cropUpload.onchange=e=>{
-const r=new FileReader();
-r.onload=()=>img.src=r.result;
-r.readAsDataURL(e.target.files[0]);
-img.onload=()=>{updateBox();updateOverlay()}
+  const r=new FileReader();
+  r.onload=()=>img.src=r.result;
+  r.readAsDataURL(e.target.files[0]);
+  img.onload=()=>{
+    zoom.style.display="block";
+    updateBox();updateOverlay();
+  };
 };
 
-zoom.oninput=updateTransform;
-rot.oninput=updateTransform;
-
-function flipH(){fx*=-1;updateTransform()}
-function flipV(){fy*=-1;updateTransform()}
-
 function updateTransform(){
-img.style.transform=`scale(${zoom.value*fx},${zoom.value*fy}) rotate(${rot.value}deg)`
+  img.style.transform=`scale(${scale}) rotate(${rotation}deg)`;
 }
 
+zoom.oninput=()=>{
+  scale=zoom.value;
+  updateTransform();
+};
+
+rotateBtn.onclick=()=>{
+  rotation=(rotation+90)%360;
+  updateTransform();
+};
+
+resetBtn.onclick=()=>{
+  scale=1;rotation=0;
+  sx=60;sy=60;bw=200;bh=200;
+  zoom.value=1;
+  updateTransform();updateBox();updateOverlay();
+};
+
 function updateBox(){
-cropBox.style.left=sx+"px";
-cropBox.style.top=sy+"px";
-cropBox.style.width=bw+"px";
-cropBox.style.height=bh+"px";
+  cropBox.style.left=sx+"px";
+  cropBox.style.top=sy+"px";
+  cropBox.style.width=bw+"px";
+  cropBox.style.height=bh+"px";
 }
 
 function updateOverlay(){
-overlay.style.clipPath=`polygon(
-0 0,100% 0,100% 100%,0 100%,
-0 ${sy}px,
-${sx}px ${sy}px,
-${sx}px ${sy+bh}px,
-${sx+bw}px ${sy+bh}px,
-${sx+bw}px ${sy}px,
-0 ${sy}px
-)`;
+  overlay.style.clipPath=`polygon(
+    0 0,100% 0,100% 100%,0 100%,
+    0 ${sy}px,
+    ${sx}px ${sy}px,
+    ${sx}px ${sy+bh}px,
+    ${sx+bw}px ${sy+bh}px,
+    ${sx+bw}px ${sy}px,
+    0 ${sy}px
+  )`;
 }
 
+/* Drag */
 cropBox.onmousedown=e=>{
-if(e.target.classList.contains("handle"))return;
-drag=true;ox=e.clientX-sx;oy=e.clientY-sy;
+  if(e.target.classList.contains("handle"))return;
+  dragging=true;
+  ox=e.clientX-sx;
+  oy=e.clientY-sy;
 };
-
 document.onmousemove=e=>{
-if(drag){sx=e.clientX-ox;sy=e.clientY-oy}
-if(resize){
-bw+=e.movementX;bh+=e.movementY;
-if(ratio.value!=="free"){
-let p=ratio.value.split("/");
-bh=bw*(p[1]/p[0]);
-}
-}
-bw=Math.max(80,bw);bh=Math.max(80,bh);
-updateBox();updateOverlay();
+  if(dragging){
+    sx=e.clientX-ox;
+    sy=e.clientY-oy;
+    updateBox();updateOverlay();
+  }
 };
+document.onmouseup=()=>dragging=false;
 
-document.onmouseup=()=>{drag=false;resize=false};
-
+/* Resize */
 document.querySelectorAll(".handle").forEach(h=>{
-h.onmousedown=e=>{resize=true;handle=h.classList[1];e.stopPropagation()}
+  h.onmousedown=e=>{
+    resizing=true;
+    handle=h.classList[1];
+    e.stopPropagation();
+  };
+});
+document.addEventListener("mousemove",e=>{
+  if(!resizing)return;
+  bw+=e.movementX;
+  bh+=e.movementY;
+  bw=Math.max(80,bw);
+  bh=Math.max(80,bh);
+  updateBox();updateOverlay();
+});
+document.addEventListener("mouseup",()=>resizing=false);
+
+/* Aspect Ratios */
+document.querySelectorAll(".ratio").forEach(r=>{
+  r.onclick=()=>{
+    document.querySelectorAll(".ratio").forEach(x=>x.classList.remove("active"));
+    r.classList.add("active");
+    if(r.dataset.r==="free")return;
+    const [a,b]=r.dataset.r.split("/");
+    bh=bw*(b/a);
+    updateBox();updateOverlay();
+  };
 });
 
+/* Apply Crop */
 function applyCrop(){
-const r=img.getBoundingClientRect();
-const x=sx*(img.naturalWidth/r.width);
-const y=sy*(img.naturalHeight/r.height);
-const w=bw*(img.naturalWidth/r.width);
-const h=bh*(img.naturalHeight/r.height);
-const c=document.createElement("canvas");
-c.width=w;c.height=h;
-const xctx=c.getContext("2d");
-xctx.translate(w/2,h/2);
-xctx.rotate(rot.value*Math.PI/180);
-xctx.scale(fx,fy);
-xctx.drawImage(img,x,y,w,h,-w/2,-h/2,w,h);
-c.toBlob(b=>{
-const a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="cropped.png";
-a.click();
-});
+  const rect=img.getBoundingClientRect();
+  const sx0=sx*(img.naturalWidth/rect.width);
+  const sy0=sy*(img.naturalHeight/rect.height);
+  const sw=bw*(img.naturalWidth/rect.width);
+  const sh=bh*(img.naturalHeight/rect.height);
+
+  const c=document.createElement("canvas");
+  c.width=sw;c.height=sh;
+  const ctx=c.getContext("2d");
+  ctx.translate(sw/2,sh/2);
+  ctx.rotate(rotation*Math.PI/180);
+  ctx.drawImage(img,sx0,sy0,sw,sh,-sw/2,-sh/2,sw,sh);
+
+  c.toBlob(b=>{
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(b);
+    a.download="edited.png";
+    a.click();
+  });
 }
 </script>
 
 </body>
 </html>
-
